@@ -1,4 +1,5 @@
 using Domain.Entities;
+using Infrastructure.Database.Configurations;
 using Infrastructure.Database.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -19,6 +20,9 @@ public class VoteHubContext : IdentityDbContext<VoteHubUser, IdentityRole<Guid>,
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
+        builder.ApplyConfiguration(new VoteConfiguration());
+        builder.ApplyConfiguration(new PollConfiguration());
+        builder.ApplyConfiguration(new PollOptionConfiguration());
         base.OnModelCreating(builder);
     }
 }

@@ -1,3 +1,5 @@
+using Infrastructure.Database;
+using Microsoft.EntityFrameworkCore;
 using Presentation.Components;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -5,6 +7,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+builder.Services.AddDbContext<VoteHubContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 
 var app = builder.Build();
 
