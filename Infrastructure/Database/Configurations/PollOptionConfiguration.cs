@@ -8,6 +8,8 @@ public class PollOptionConfiguration : IEntityTypeConfiguration<PollOption>
 {
     public void Configure(EntityTypeBuilder<PollOption> builder)
     {
-        
+        builder.HasOne(po => po.Poll)
+            .WithMany(p => p.Options)
+            .HasForeignKey(po => po.PollId);
     }
 }

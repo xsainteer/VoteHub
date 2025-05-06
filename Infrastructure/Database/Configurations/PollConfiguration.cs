@@ -10,5 +10,9 @@ public class PollConfiguration : IEntityTypeConfiguration<Poll>
     {
         builder.Property(p => p.Name).HasMaxLength(150);
         builder.Property(p => p.Description).HasMaxLength(500);
+
+        builder.HasOne(p => p.Creator)
+            .WithMany(u => u.CreatedPolls)
+            .HasForeignKey(p => p.CreatorId);
     }
 }
