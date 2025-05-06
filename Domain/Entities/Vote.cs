@@ -2,9 +2,15 @@ namespace Domain.Entities;
 
 public class Vote
 {
-    public int Id { get; set; }
-    public int PollId { get; set; }
-    public int PollOptionId { get; set; }
-    public DateTime CreatedAt { get; set; }
-    public int UserId { get; set; }
+    public Guid PollId { get; set; }
+    public Poll Poll { get; set; } = null!;
+
+    public Guid PollOptionId { get; set; }
+    public PollOption PollOption { get; set; } = null!;
+
+    public Guid UserId { get; set; }
+    // TODO : Add User property
+    
+    public DateTime VotedAt { get; set; }
+    
 }
