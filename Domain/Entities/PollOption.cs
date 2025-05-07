@@ -1,6 +1,3 @@
-using System.Collections;
-using Domain.Interfaces;
-
 namespace Domain.Entities;
 
 public class PollOption
@@ -12,5 +9,5 @@ public class PollOption
     public Guid PollId { get; set; }
     public Poll Poll { get; set; } = null!;
 
-    public ICollection<IUser> SelectedByUsers { get; set; } = [];
+    public ICollection<Vote> Votes { get; set; } = [];
 }

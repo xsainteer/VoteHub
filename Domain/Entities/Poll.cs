@@ -13,7 +13,6 @@ public class Poll
     public DateTime ExpiresAt { get; set; }
     
     public Guid CreatorId { get; set; }
-    public IUser Creator { get; set; } = null!;
     
     public ICollection<PollOption> Options { get; set; } = null!;
     public ICollection<Vote> Participants { get; set; } = null!;

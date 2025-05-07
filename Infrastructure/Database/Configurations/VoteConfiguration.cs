@@ -1,4 +1,5 @@
 using Domain.Entities;
+using Infrastructure.Database.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -10,12 +11,16 @@ public class VoteConfiguration : IEntityTypeConfiguration<Vote>
     {
         builder.HasKey(v => new { v.UserId, v.PollId });
 
-        builder.HasOne(v => v.User)
+        builder.HasOne<VoteHubUser>()
             .WithMany(u => u.GivenVotes)
             .HasForeignKey(v => v.UserId);
 
         builder.HasOne(v => v.Poll)
             .WithMany(p => p.Participants)
             .HasForeignKey(v => v.PollId);
+
+        builder.HasOne(v => v.PollOption)
+            .WithMany(po => po.Votes)
+            .HasForeignKey(v => v.PollOptionId);
     }
 }
