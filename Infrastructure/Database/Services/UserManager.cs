@@ -8,13 +8,15 @@ namespace Infrastructure.Database.Services;
 public class UserManager : IUserManager
 {
     private readonly UserManager<VoteHubUser> _userManager;
+    private readonly SignInManager<VoteHubUser> _signInManager;
 
-    public UserManager(UserManager<VoteHubUser> userManager)
+    public UserManager(UserManager<VoteHubUser> userManager, SignInManager<VoteHubUser> signInManager)
     {
         _userManager = userManager;
+        _signInManager = signInManager;
     }
 
-    public async Task<bool> CreateUserAsync(RegisterUserDto userDto)
+    public async Task<bool> RegisterUserAsync(RegisterUserDto userDto)
     {
         var user = new VoteHubUser
         {
@@ -23,6 +25,16 @@ public class UserManager : IUserManager
         };
         
         var result = await _userManager.CreateAsync(user, userDto.Password);
+        return result.Succeeded;
+    }
+    
+    public async Task<bool> LogInUserAsync(LogInUserDto userDto)
+    {
+        var result = await _signInManager.PasswordSignInAsync(
+            userDto.UserName,
+            userDto.Password,
+            userDto.RememberMe,
+            false);
         return result.Succeeded;
     }
 

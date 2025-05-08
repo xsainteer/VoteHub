@@ -26,12 +26,29 @@ builder.Services.AddApplication();
 builder.Services.AddInfrastructure();
 
 // Identity 2
-builder.Services.AddIdentity<VoteHubUser, IdentityRole<Guid>>()
+builder.Services.AddIdentity<VoteHubUser, IdentityRole<Guid>>(options =>
+        options.SignIn.RequireConfirmedAccount = false)
     .AddEntityFrameworkStores<VoteHubContext>()
     .AddDefaultTokenProviders();
 
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.SameSite = SameSiteMode.Lax;
+    options.Events.OnRedirectToLogin = context =>
+    {
+        context.Response.StatusCode = 401;
+        return Task.CompletedTask;
+    };
+    options.Events.OnRedirectToAccessDenied = context =>
+    {
+        context.Response.StatusCode = 403;
+        return Task.CompletedTask;
+    };
+});
+
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
+
 
 // Blazorise
 builder.Services

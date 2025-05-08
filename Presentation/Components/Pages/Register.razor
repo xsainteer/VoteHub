@@ -10,6 +10,7 @@
 
 <Validations @ref="validations" Mode="ValidationMode.Auto" Model="@_registerUserDto" ValidateOnLoad>
     <Fields Class="d-flex flex-column gap-2">
+        @* USERNAME *@
         <Validation>
             <Field>
                 <FieldLabel RequiredIndicator>User Name</FieldLabel>
@@ -23,6 +24,7 @@
             </Field>
         </Validation>
 
+        @* EMAIL *@
         <Validation>
             <Field>
                 <FieldLabel RequiredIndicator>Email</FieldLabel>
@@ -36,6 +38,7 @@
             </Field>
         </Validation>
 
+        @* PASSWORD *@
         <Validation>
             <Field>
                 <FieldLabel RequiredIndicator>Password</FieldLabel>
