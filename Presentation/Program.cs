@@ -5,9 +5,11 @@ using Blazorise.Icons.FontAwesome;
 using Infrastructure;
 using Infrastructure.Database;
 using Infrastructure.Database.Entities;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Presentation.Components;
+using Presentation.Components.Account;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,31 +26,33 @@ builder.Services.AddApplication();
 
 //Infrastructure services
 builder.Services.AddInfrastructure();
-
-// Identity 2
-builder.Services.AddIdentity<VoteHubUser, IdentityRole<Guid>>(options =>
-        options.SignIn.RequireConfirmedAccount = false)
-    .AddEntityFrameworkStores<VoteHubContext>()
-    .AddDefaultTokenProviders();
-
-builder.Services.ConfigureApplicationCookie(options =>
+builder.Services.AddDbContext<VoteHubContext>(options =>
 {
-    options.Cookie.SameSite = SameSiteMode.Lax;
-    options.Events.OnRedirectToLogin = context =>
-    {
-        context.Response.StatusCode = 401;
-        return Task.CompletedTask;
-    };
-    options.Events.OnRedirectToAccessDenied = context =>
-    {
-        context.Response.StatusCode = 403;
-        return Task.CompletedTask;
-    };
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
-builder.Services.AddAuthentication();
-builder.Services.AddAuthorization();
 
+//Identity 2
+builder.Services.AddCascadingAuthenticationState();
+builder.Services.AddScoped<IdentityUserAccessor>();
+builder.Services.AddScoped<IdentityRedirectManager>();
+builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
+
+
+builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultScheme = IdentityConstants.ApplicationScheme;
+        options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
+        options.RequireAuthenticatedSignIn = false;
+    })
+    .AddIdentityCookies();
+
+builder.Services.AddIdentityCore<VoteHubUser>(options => options.SignIn.RequireConfirmedAccount = true)
+    .AddEntityFrameworkStores<VoteHubContext>()
+    .AddSignInManager()
+    .AddDefaultTokenProviders();
+
+builder.Services.AddSingleton<IEmailSender<VoteHubUser>, IdentityNoOpEmailSender>();
 
 // Blazorise
 builder.Services
@@ -75,6 +79,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseAntiforgery();
+
+app.MapAdditionalIdentityEndpoints();
 
 app.MapStaticAssets();
 app.MapRazorComponents<App>()

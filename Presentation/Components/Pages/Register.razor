@@ -1,92 +1,89 @@
-@page "/register"
-@using Application.Services
-@using Domain.DTOs
-@inject IUserService UserService
-@inject NavigationManager NavigationManager
-@rendermode InteractiveServer
-
-<h3>Register</h3>
-
-
-<Validations @ref="validations" Mode="ValidationMode.Auto" Model="@_registerUserDto" ValidateOnLoad>
-    <Fields Class="d-flex flex-column gap-2">
-        @* USERNAME *@
-        <Validation>
-            <Field>
-                <FieldLabel RequiredIndicator>User Name</FieldLabel>
-                <FieldBody>
-                    <TextEdit @bind-Text="@_registerUserDto.UserName">
-                        <Feedback>
-                            <ValidationError/>
-                        </Feedback>
-                    </TextEdit>
-                </FieldBody>
-            </Field>
-        </Validation>
-
-        @* EMAIL *@
-        <Validation>
-            <Field>
-                <FieldLabel RequiredIndicator>Email</FieldLabel>
-                <FieldBody>
-                    <TextEdit @bind-Text="@_registerUserDto.Email" Role="@TextRole.Email" InputMode="TextInputMode.Email">
-                        <Feedback>
-                            <ValidationError/>
-                        </Feedback>
-                    </TextEdit>
-                </FieldBody>
-            </Field>
-        </Validation>
-
-        @* PASSWORD *@
-        <Validation>
-            <Field>
-                <FieldLabel RequiredIndicator>Password</FieldLabel>
-                <FieldBody>
-                    <TextEdit @bind-Text="@_registerUserDto.Password" Role="@TextRole.Password">
-                        <Feedback>
-                            <ValidationError/>
-                        </Feedback>
-                    </TextEdit>
-                </FieldBody>
-            </Field>
-        </Validation>
-
-        <Field>
-            <Button Type="@ButtonType.Submit" Color="Color.Primary" Loading="_isLoading" Clicked="@RegisterUser">Register</Button>
-        </Field>
-    </Fields>
-</Validations>
-
-
-
-@code {
-    Validations validations;
-    readonly RegisterUserDto _registerUserDto = new();
-    bool _isLoading = false;
-    
-    private async Task RegisterUser()
-    {
-        Console.WriteLine("registering");
-        if (!await validations.ValidateAll())
-            return;
-        
-        _isLoading = true;
-        var result = await UserService.CreateAsync(_registerUserDto);
-
-        _isLoading = false;
-        
-        Console.WriteLine("finished registering");
-        Console.WriteLine(result);
-
-        if (result)
-        {
-            Console.WriteLine("navigated");
-            NavigationManager.NavigateTo("/login");
-        }
-        else
-        {
-            //TODO
-        };
-    }
-}
+@* @page "/register" *@
+@* @using Application.Services *@
+@* @using Domain.DTOs *@
+@* @inject IUserService UserService *@
+@* @inject NavigationManager NavigationManager *@
+@* @rendermode InteractiveServer *@
+@* *@
+@* <h3>Register</h3> *@
+@* *@
+@* *@
+@* <Validations @ref="validations" Mode="ValidationMode.Auto" Model="@_registerUserDto" ValidateOnLoad> *@
+@*     <Fields Class="d-flex flex-column gap-2"> *@
+@*         <Validation> *@
+@*             <Field> *@
+@*                 <FieldLabel RequiredIndicator>User Name</FieldLabel> *@
+@*                 <FieldBody> *@
+@*                     <TextEdit @bind-Text="@_registerUserDto.UserName"> *@
+@*                         <Feedback> *@
+@*                             <ValidationError/> *@
+@*                         </Feedback> *@
+@*                     </TextEdit> *@
+@*                 </FieldBody> *@
+@*             </Field> *@
+@*         </Validation> *@
+@* *@
+@*         <Validation> *@
+@*             <Field> *@
+@*                 <FieldLabel RequiredIndicator>Email</FieldLabel> *@
+@*                 <FieldBody> *@
+@*                     <TextEdit @bind-Text="@_registerUserDto.Email" Role="@TextRole.Email" InputMode="TextInputMode.Email"> *@
+@*                         <Feedback> *@
+@*                             <ValidationError/> *@
+@*                         </Feedback> *@
+@*                     </TextEdit> *@
+@*                 </FieldBody> *@
+@*             </Field> *@
+@*         </Validation> *@
+@* *@
+@*         <Validation> *@
+@*             <Field> *@
+@*                 <FieldLabel RequiredIndicator>Password</FieldLabel> *@
+@*                 <FieldBody> *@
+@*                     <TextEdit @bind-Text="@_registerUserDto.Password" Role="@TextRole.Password"> *@
+@*                         <Feedback> *@
+@*                             <ValidationError/> *@
+@*                         </Feedback> *@
+@*                     </TextEdit> *@
+@*                 </FieldBody> *@
+@*             </Field> *@
+@*         </Validation> *@
+@* *@
+@*         <Field> *@
+@*             <Button Type="@ButtonType.Submit" Color="Color.Primary" Loading="_isLoading" Clicked="@RegisterUser">Register</Button> *@
+@*         </Field> *@
+@*     </Fields> *@
+@* </Validations> *@
+@* *@
+@* *@
+@* *@
+@* @code { *@
+@*     Validations validations; *@
+@*     readonly RegisterUserDto _registerUserDto = new(); *@
+@*     bool _isLoading = false; *@
+@*      *@
+@*     private async Task RegisterUser() *@
+@*     { *@
+@*         Console.WriteLine("registering"); *@
+@*         if (!await validations.ValidateAll()) *@
+@*             return; *@
+@*          *@
+@*         _isLoading = true; *@
+@*         var result = await UserService.CreateAsync(_registerUserDto); *@
+@* *@
+@*         _isLoading = false; *@
+@*          *@
+@*         Console.WriteLine("finished registering"); *@
+@*         Console.WriteLine(result); *@
+@* *@
+@*         if (result) *@
+@*         { *@
+@*             Console.WriteLine("navigated"); *@
+@*             NavigationManager.NavigateTo("/login"); *@
+@*         } *@
+@*         else *@
+@*         { *@
+@*             //TODO *@
+@*         }; *@
+@*     } *@
+@* } *@
