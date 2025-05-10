@@ -5,6 +5,7 @@ using Blazorise.Icons.FontAwesome;
 using Infrastructure;
 using Infrastructure.Database;
 using Infrastructure.Database.Entities;
+using Infrastructure.Email;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -43,7 +44,6 @@ builder.Services.AddAuthentication(options =>
     {
         options.DefaultScheme = IdentityConstants.ApplicationScheme;
         options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
-        options.RequireAuthenticatedSignIn = false;
     })
     .AddIdentityCookies();
 
@@ -52,7 +52,7 @@ builder.Services.AddIdentityCore<VoteHubUser>(options => options.SignIn.RequireC
     .AddSignInManager()
     .AddDefaultTokenProviders();
 
-builder.Services.AddSingleton<IEmailSender<VoteHubUser>, IdentityNoOpEmailSender>();
+builder.Services.AddSingleton<IEmailSender<VoteHubUser>, SmtpEmailSender>();
 
 // Blazorise
 builder.Services
