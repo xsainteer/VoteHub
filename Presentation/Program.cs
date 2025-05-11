@@ -47,7 +47,8 @@ builder.Services.AddAuthentication(options =>
     })
     .AddIdentityCookies();
 
-builder.Services.AddIdentityCore<VoteHubUser>(options => options.SignIn.RequireConfirmedAccount = true)
+builder.Services.AddIdentityCore<VoteHubUser>(options => 
+        options.SignIn.RequireConfirmedAccount = builder.Configuration.GetValue("SignIn.RequireConfirmedAccount", false))
     .AddEntityFrameworkStores<VoteHubContext>()
     .AddSignInManager()
     .AddDefaultTokenProviders();
