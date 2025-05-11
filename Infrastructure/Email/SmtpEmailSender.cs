@@ -3,6 +3,7 @@ using System.Net.Mail;
 using Infrastructure.Database.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Infrastructure.Email;
 
@@ -11,9 +12,9 @@ public class SmtpEmailSender : IEmailSender<VoteHubUser>
     private readonly SmtpSettings _settings;
     private readonly ILogger<SmtpEmailSender> _logger;
 
-    public SmtpEmailSender(SmtpSettings settings, ILogger<SmtpEmailSender> logger)
+    public SmtpEmailSender(IOptions<SmtpSettings> options, ILogger<SmtpEmailSender> logger)
     {
-        _settings = settings;
+        _settings = options.Value;
         _logger = logger;
     }
 
