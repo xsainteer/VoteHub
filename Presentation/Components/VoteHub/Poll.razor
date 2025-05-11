@@ -1,0 +1,30 @@
+@using EntityPoll = Domain.Entities.Poll;
+@using EntityPollOption = Domain.Entities.PollOption;
+@using Blazorise
+
+<h3>Poll</h3>
+
+<Card>
+    <CardHeader>
+        <CardTitle>@EntityPoll.Title</CardTitle>
+        <CardSubtitle>@EntityPoll.Description</CardSubtitle>
+    </CardHeader>
+
+    <CardBody>
+        @foreach (var option in EntityPoll.Options)
+        {
+            <PollOption Option="option" OnClick="HandleClick" />
+        }
+    </CardBody>
+</Card>
+
+@code {
+    [Parameter]
+    public EntityPoll EntityPoll { get; set; } = new();
+    
+    private async Task HandleClick(EntityPollOption option)
+    {
+        //TODO
+        await Task.CompletedTask;
+    }
+}

@@ -30,7 +30,7 @@ public class SmtpEmailSender : IEmailSender<VoteHubUser>
         SendEmailAsync(user.Email, "VoteHub password reset code",
             $"Reset password code: <strong>{resetCode}</strong>.");
     
-    private async Task SendEmailAsync(string to, string subject, string body)
+    private async Task SendEmailAsync(string? to, string subject, string body)
     {
         if (string.IsNullOrWhiteSpace(to))
             throw new ArgumentException("Email cannot be null or empty", nameof(to));

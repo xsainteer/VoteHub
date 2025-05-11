@@ -1,0 +1,16 @@
+@using Blazorise
+@using EntityPollOption = Domain.Entities.PollOption
+
+<h3>PollOption</h3>
+
+<Button Color="Color.Light" Clicked="HandleClick">@Option.Text</Button>
+
+@code {
+    [Parameter]
+    public EntityPollOption Option { get; set; } = new();
+    
+    [Parameter]
+    public EventCallback<EntityPollOption> OnClick { get; set; }
+    
+    private async Task HandleClick() => await OnClick.InvokeAsync(Option);
+}
