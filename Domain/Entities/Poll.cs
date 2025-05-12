@@ -2,15 +2,15 @@ using Domain.Interfaces;
 
 namespace Domain.Entities;
 
-public class Poll
+public class Poll : IHasId, IHasName
 {
     public Guid Id { get; set; }
-    public string Title { get; set; } = null!;
+    public string Name { get; set; } = null!;
     public string Description { get; set; } = null!;
 
     public DateTime CreatedAt { get; set; }
     
-    public DateTime ExpiresAt { get; set; }
+    public DateTime? ExpiresAt { get; set; }
     
     public Guid CreatorId { get; set; }
     

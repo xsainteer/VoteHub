@@ -1,0 +1,135 @@
+@using Application.Services
+@using Blazorise
+@using Infrastructure.Database.Entities
+@using Microsoft.AspNetCore.Identity
+@using EntityPoll = Domain.Entities.Poll
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject UserManager<VoteHubUser> UserManager
+@using EntityPollOption = Domain.Entities.PollOption
+@inject IPollService PollService
+@inject ILogger<PollCreation> Logger
+
+<h3>PollCreation</h3>
+
+<Fields>
+    @* Poll Creation *@
+    <Field>
+        <FieldLabel>Poll Name</FieldLabel>
+        <TextEdit @bind-Text="_poll.Name"></TextEdit>
+    </Field>
+    <Field>
+        <FieldLabel>Poll Description</FieldLabel>
+        <TextEdit @bind-Text="_poll.Description" Size="Size.Large"></TextEdit>
+    </Field>
+    <Field>
+        <Switch TValue="bool" CheckedChanged="HandleExpiryDateChange"></Switch>
+        <Tooltip Text="Click me!">
+            <DatePicker TValue="DateTime?" @bind-Date="@_poll.ExpiresAt"></DatePicker>
+        </Tooltip>
+    </Field>
+
+    @* Poll Option Creation *@
+    <Fields>
+        <Alert Color="_alertProps.Color" @bind-Visible="_alertProps.IsVisible">
+            <AlertMessage>@_alertProps.Message</AlertMessage>
+        </Alert>
+        <Field>
+            <FieldLabel>Poll Option Name</FieldLabel>
+            <TextEdit @bind-Text="_pollOptionCreating.Name"></TextEdit>
+        </Field>
+        <Field>
+            <FieldLabel>Poll Option Description</FieldLabel>
+            <TextEdit @bind-Text="_pollOptionCreating.Description" Size="Size.Medium"></TextEdit>
+        </Field>
+        <Field>
+            <Button Color="Color.Success" Clicked="HandlePollOptionClick">Create Poll Option</Button>
+        </Field>
+    </Fields>
+    
+    @* Poll Options *@
+    <Fields>
+        @foreach (var option in _poll.Options)
+        {
+            <Field>
+                <FieldLabel>Poll Option Name</FieldLabel>
+                <Tooltip Text="Can be changed dynamically!">
+                    <TextEdit @bind-Text="option.Name"></TextEdit>
+                </Tooltip>
+            </Field>
+            <Field>
+                <FieldLabel>Poll Option Description</FieldLabel>
+                <Tooltip Text="Can be changed dynamically!">
+                    <TextEdit @bind-Text="option.Description" Size="Size.Medium"></TextEdit>
+                </Tooltip>
+            </Field>
+        }
+    </Fields>
+    
+    @* Submit Button *@
+    <Field>
+        <Button Color="Color.Primary" Clicked="HandleSubmit">Create Poll</Button>
+    </Field>
+</Fields>
+
+@code {
+    private EntityPoll _poll { get; set; }
+    private EntityPollOption _pollOptionCreating { get; set; }
+    
+    private AlertProps _alertProps { get; set; }
+    
+    private VoteHubUser? _currentUser;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity?.IsAuthenticated == true)
+        {
+            _currentUser = await UserManager.GetUserAsync(user);
+        }
+        else
+        {
+            _currentUser = null;
+        }
+    }
+
+    private async Task HandleSubmit()
+    {
+        try
+        {
+            await PollService.AddAsync(_poll);
+        }
+        catch (Exception e)
+        {
+            Logger.LogError("Error while creating poll: {Message}", e.Message);;
+            throw;
+        }
+    }
+    
+    private async Task HandlePollOptionClick()
+    {
+        //when submitting a new poll option Alert visibility should be reset
+        _alertProps.IsVisible = false;
+        
+        if (string.IsNullOrWhiteSpace(_pollOptionCreating.Name))
+        {
+            _alertProps.Message = "please fill the poll option name";
+            _alertProps.IsVisible = true;
+            return;
+        }
+        
+        _poll.Options.Add(_pollOptionCreating);
+    }
+
+    private async Task HandleExpiryDateChange(bool isChecked)
+    {
+    }
+    
+    public class AlertProps
+    {
+        public bool IsVisible { get; set; }
+        public Color Color { get; set; } = Color.Danger;
+        public string Message { get; set; } = string.Empty;
+    }
+}

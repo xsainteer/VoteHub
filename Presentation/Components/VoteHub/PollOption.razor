@@ -3,11 +3,13 @@
 
 <h3>PollOption</h3>
 
-<Button Color="Color.Light" Clicked="HandleClick">@Option.Text</Button>
+<Tooltip Text="@Option.Description">
+    <Button Color="Color.Light" Clicked="HandleClick">@Option.Name</Button>
+</Tooltip>
 
 @code {
     [Parameter]
-    public EntityPollOption Option { get; set; } = new();
+    public static EntityPollOption Option { get; set; } = new();
     
     [Parameter]
     public EventCallback<EntityPollOption> OnClick { get; set; }

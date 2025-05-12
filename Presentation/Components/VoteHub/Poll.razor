@@ -1,30 +1,81 @@
+@using Application.Services
 @using EntityPoll = Domain.Entities.Poll;
 @using EntityPollOption = Domain.Entities.PollOption;
 @using Blazorise
+@using Infrastructure.Database.Entities
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<VoteHubUser> UserManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IPollOptionService PollOptionService
 
 <h3>Poll</h3>
 
 <Card>
     <CardHeader>
-        <CardTitle>@EntityPoll.Title</CardTitle>
+        <CardTitle>@EntityPoll.Name</CardTitle>
         <CardSubtitle>@EntityPoll.Description</CardSubtitle>
+        <Alert @ref="_alert">
+            <AlertMessage>@_alertMessage</AlertMessage>
+        </Alert>
     </CardHeader>
 
-    <CardBody>
-        @foreach (var option in EntityPoll.Options)
+    <CardText>
+        @foreach (var option in _pollOptions)
         {
-            <PollOption Option="option" OnClick="HandleClick" />
+            <PollOption Option="@option" OnClick="HandleClick"/>
         }
-    </CardBody>
+    </CardText>
 </Card>
 
 @code {
     [Parameter]
     public EntityPoll EntityPoll { get; set; } = new();
     
+    private List<EntityPollOption> _pollOptions = new();
+    
+    private VoteHubUser? _currentUser;
+
+    private Alert _alert = null!;
+
+    private string? _alertMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity?.IsAuthenticated == true)
+        {
+            _currentUser = await UserManager.GetUserAsync(user);
+        }
+        else
+        {
+            _currentUser = null;
+        }
+        
+        _pollOptions = await PollOptionService.GetPollOptionsByPollIdAsync(EntityPoll.Id);
+    }
+    
     private async Task HandleClick(EntityPollOption option)
     {
-        //TODO
-        await Task.CompletedTask;
+        await ShowAlertMessage();
+        
+        
+    }
+
+    private async Task ShowAlertMessage()
+    {
+        if (_currentUser == null)
+        {
+            _alert.Color = Color.Danger;
+            _alertMessage = "You must be logged in to vote.";
+        }
+        else
+        {
+            _alert.Color = Color.Success;
+            _alertMessage = "Vote submitted successfully.";
+        }
+
+        await _alert.Show();
     }
 }
