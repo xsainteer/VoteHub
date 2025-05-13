@@ -8,89 +8,113 @@
 @using EntityPollOption = Domain.Entities.PollOption
 @inject IPollService PollService
 @inject ILogger<PollCreation> Logger
+@inject NavigationManager NavigationManager
 
 <h3>PollCreation</h3>
 
-<Fields>
-    @* Poll Creation *@
-    <Field>
-        <FieldLabel>Poll Name</FieldLabel>
-        <TextEdit @bind-Text="_poll.Name"></TextEdit>
-    </Field>
-    <Field>
-        <FieldLabel>Poll Description</FieldLabel>
-        <TextEdit @bind-Text="_poll.Description" Size="Size.Large"></TextEdit>
-    </Field>
-    <Field>
-        <Switch TValue="bool" CheckedChanged="HandleExpiryDateChange"></Switch>
-        <Tooltip Text="Click me!">
-            <DatePicker TValue="DateTime?" @bind-Date="@_poll.ExpiresAt"></DatePicker>
-        </Tooltip>
-    </Field>
+<AuthorizeView>
+    <Authorized>
+        <Fields>
+            @* Poll Creation *@
+            <Field>
+                <FieldLabel>Poll Name</FieldLabel>
+                <TextEdit @bind-Text="Poll.Name"></TextEdit>
+            </Field>
+            
+            <Field>
+                <FieldLabel>Poll Description</FieldLabel>
+                <TextEdit @bind-Text="Poll.Description" Size="Size.Large"></TextEdit>
+            </Field>
+            
+            <Field>
+                <Switch TValue="bool" Checked="_showDatePicker" CheckedChanged="HandleExpiryDateToggle"></Switch>
+                
+                @if (_showDatePicker)
+                {
+                    <Tooltip Text="Click me to choose a date!">
+                        <DatePicker TValue="DateTime?" @bind-Date="@Poll.ExpiresAt" Placeholder="DD/MM/YYYY"></DatePicker>
+                    </Tooltip>
+                }
+            </Field>
 
-    @* Poll Option Creation *@
-    <Fields>
-        <Alert Color="_alertProps.Color" @bind-Visible="_alertProps.IsVisible">
-            <AlertMessage>@_alertProps.Message</AlertMessage>
-        </Alert>
-        <Field>
-            <FieldLabel>Poll Option Name</FieldLabel>
-            <TextEdit @bind-Text="_pollOptionCreating.Name"></TextEdit>
-        </Field>
-        <Field>
-            <FieldLabel>Poll Option Description</FieldLabel>
-            <TextEdit @bind-Text="_pollOptionCreating.Description" Size="Size.Medium"></TextEdit>
-        </Field>
-        <Field>
-            <Button Color="Color.Success" Clicked="HandlePollOptionClick">Create Poll Option</Button>
-        </Field>
-    </Fields>
-    
-    @* Poll Options *@
-    <Fields>
-        @foreach (var option in _poll.Options)
-        {
+            @* Poll Option Creation *@
+            <Fields>
+                <Alert Color="AlertProperties.Color" @bind-Visible="AlertProperties.IsVisible">
+                    <AlertMessage>@AlertProperties.Message</AlertMessage>
+                </Alert>
+                
+                <Field>
+                    <FieldLabel>Poll Option Name</FieldLabel>
+                    <TextEdit @bind-Text="PollOptionCreating.Name"></TextEdit>
+                </Field>
+                
+                <Field>
+                    <FieldLabel>Poll Option Description</FieldLabel>
+                    <TextEdit @bind-Text="PollOptionCreating.Description" Size="Size.Medium"></TextEdit>
+                </Field>
+                
+                <Field>
+                    <Button Color="Color.Success" Clicked="HandlePollOptionClick">Create Poll Option</Button>
+                </Field>
+            </Fields>
+            
+            @* Poll Options *@
+            <Fields>
+                @foreach (var option in Poll.Options)
+                {
+                    <Field>
+                        <FieldLabel>Poll Option Name</FieldLabel>
+                        <Tooltip Text="Can be changed dynamically!">
+                            <TextEdit @bind-Text="option.Name"></TextEdit>
+                        </Tooltip>
+                    </Field>
+                    
+                    <Field>
+                        <FieldLabel>Poll Option Description</FieldLabel>
+                        <Tooltip Text="Can be changed dynamically!">
+                            <TextEdit @bind-Text="option.Description" Size="Size.Medium"></TextEdit>
+                        </Tooltip>
+                    </Field>
+                }
+            </Fields>
+            
+            @* Submit Button *@
             <Field>
-                <FieldLabel>Poll Option Name</FieldLabel>
-                <Tooltip Text="Can be changed dynamically!">
-                    <TextEdit @bind-Text="option.Name"></TextEdit>
-                </Tooltip>
+                <Button Color="Color.Primary" Clicked="HandleSubmit">Create Poll</Button>
             </Field>
-            <Field>
-                <FieldLabel>Poll Option Description</FieldLabel>
-                <Tooltip Text="Can be changed dynamically!">
-                    <TextEdit @bind-Text="option.Description" Size="Size.Medium"></TextEdit>
-                </Tooltip>
-            </Field>
-        }
-    </Fields>
+        </Fields>
+    </Authorized>
     
-    @* Submit Button *@
-    <Field>
-        <Button Color="Color.Primary" Clicked="HandleSubmit">Create Poll</Button>
-    </Field>
-</Fields>
+    <NotAuthorized>
+        <p>Please log in in order to create a poll.</p>
+    </NotAuthorized>
+</AuthorizeView>
 
 @code {
-    private EntityPoll _poll { get; set; }
-    private EntityPollOption _pollOptionCreating { get; set; }
+    private EntityPoll Poll { get; set; } = new();
+    private EntityPollOption PollOptionCreating { get; set; } = new();
+
+    private AlertProps AlertProperties { get; set; } = new();
     
-    private AlertProps _alertProps { get; set; }
+    private bool _showDatePicker = false;
     
-    private VoteHubUser? _currentUser;
+    private VoteHubUser _currentUser = null!;
     
+    // getting a user from the authentication state
     protected override async Task OnInitializedAsync()
     {
+        try
+        {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
-
-        if (user.Identity?.IsAuthenticated == true)
-        {
-            _currentUser = await UserManager.GetUserAsync(user);
+        
+        _currentUser = await UserManager.GetUserAsync(user) ?? throw new InvalidOperationException("User not found");
+        
         }
-        else
+        catch (Exception e)
         {
-            _currentUser = null;
+            Logger.LogError("Error while getting user from authentication state: {Message}", e.Message);
+            throw;
         }
     }
 
@@ -98,7 +122,9 @@
     {
         try
         {
-            await PollService.AddAsync(_poll);
+            Poll.Id = _currentUser.Id;
+            
+            await PollService.AddAsync(Poll);
         }
         catch (Exception e)
         {
@@ -107,23 +133,32 @@
         }
     }
     
-    private async Task HandlePollOptionClick()
+    private void HandlePollOptionClick()
     {
         //when submitting a new poll option Alert visibility should be reset
-        _alertProps.IsVisible = false;
+        AlertProperties.IsVisible = false;
         
-        if (string.IsNullOrWhiteSpace(_pollOptionCreating.Name))
+        if (string.IsNullOrWhiteSpace(PollOptionCreating.Name))
         {
-            _alertProps.Message = "please fill the poll option name";
-            _alertProps.IsVisible = true;
+            AlertProperties.Message = "please fill the poll option name";
+            AlertProperties.IsVisible = true;
             return;
         }
         
-        _poll.Options.Add(_pollOptionCreating);
+        Poll.Options.Add(PollOptionCreating);
+        
+        // reset the poll option to make new poll options if needed
+        PollOptionCreating = new EntityPollOption();
     }
 
-    private async Task HandleExpiryDateChange(bool isChecked)
+    // if user decides to disable the date picker, the poll expiration date should be set to null
+    // (that's why i need this method)
+    private void HandleExpiryDateToggle(bool isChecked)
     {
+        if (!isChecked)
+        {
+            Poll.ExpiresAt = null;
+        }
     }
     
     public class AlertProps
