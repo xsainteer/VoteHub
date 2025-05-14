@@ -3,9 +3,13 @@
 
 <h3>PollOption</h3>
 
-<Tooltip Text="@Option.Description">
-    <Button Color="Color.Light" Clicked="HandleClick">@Option.Name</Button>
-</Tooltip>
+@* Better to wrap poll options in <Fields></Fields> to customize it properly *@
+
+<Field>
+    <Tooltip Text="@Option.Description">
+        <Button Color="Color.Light" Clicked="HandleClick">@Option.Name</Button>
+    </Tooltip>
+</Field>
 
 @code {
     [Parameter]

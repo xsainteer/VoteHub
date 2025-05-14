@@ -2,6 +2,7 @@
 @using Blazorise
 @using Infrastructure.Database.Entities
 @using Microsoft.AspNetCore.Identity
+@using Presentation.Extensions
 @using EntityPoll = Domain.Entities.Poll
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject UserManager<VoteHubUser> UserManager
@@ -161,10 +162,5 @@
         }
     }
     
-    public class AlertProps
-    {
-        public bool IsVisible { get; set; }
-        public Color Color { get; set; } = Color.Danger;
-        public string Message { get; set; } = string.Empty;
-    }
+    //TODO divide all that code into smaller files, looks too big
 }

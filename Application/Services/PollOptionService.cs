@@ -11,12 +11,14 @@ public interface IPollOptionService
 
 public class PollOptionService : GenericService<PollOption>, IPollOptionService
 {
+    // another repository for poll options specific methods
     private readonly IPollOptionRepository _pollOptionRepository;
 
 
-    public PollOptionService(IPollOptionRepository repository, ILogger<PollOptionService> logger) : base(repository, logger)
+    public PollOptionService(IGenericRepository<PollOption> repository, IPollOptionRepository pollOptionRepository, ILogger<PollOptionService> logger)
+        : base(repository, logger)
     {
-        _pollOptionRepository = repository;
+        _pollOptionRepository = pollOptionRepository;
     }
 
     public async Task<List<PollOption>> GetPollOptionsByPollIdAsync(Guid pollId)

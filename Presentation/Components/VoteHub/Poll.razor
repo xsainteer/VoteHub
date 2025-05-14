@@ -1,9 +1,12 @@
+@using System.Runtime.InteropServices.JavaScript
 @using Application.Services
 @using EntityPoll = Domain.Entities.Poll;
 @using EntityPollOption = Domain.Entities.PollOption;
 @using Blazorise
+@using Domain.Entities
 @using Infrastructure.Database.Entities
 @using Microsoft.AspNetCore.Identity
+@using Presentation.Extensions
 @inject UserManager<VoteHubUser> UserManager
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IPollOptionService PollOptionService
@@ -13,31 +16,34 @@
 <Card>
     <CardHeader>
         <CardTitle>@EntityPoll.Name</CardTitle>
+        
         <CardSubtitle>@EntityPoll.Description</CardSubtitle>
-        <Alert @ref="_alert">
-            <AlertMessage>@_alertMessage</AlertMessage>
+        
+        <Alert bind-Visible="AlertProperties.IsVisible" Color="AlertProperties.Color">
+            <AlertMessage>@AlertProperties.Message</AlertMessage>
         </Alert>
     </CardHeader>
 
-    <CardText>
-        @foreach (var option in _pollOptions)
+    <Fields>
+        @foreach (var option in PollOptions)
         {
-            <PollOption Option="@option" OnClick="HandleClick"/>
+            <PollOption Option="@option" OnClick="HandlePollOptionClick"/>
         }
-    </CardText>
+    </Fields>
 </Card>
 
 @code {
     [Parameter]
     public EntityPoll EntityPoll { get; set; } = new();
     
-    private List<EntityPollOption> _pollOptions = new();
+    [Parameter]
+    private List<EntityPollOption> PollOptions { get; set; } = [];
     
     private VoteHubUser? _currentUser;
 
-    private Alert _alert = null!;
+    private Vote? UserVote { get; set; }
 
-    private string? _alertMessage;
+    AlertProps AlertProperties { get; set; } = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -53,29 +59,38 @@
             _currentUser = null;
         }
         
-        _pollOptions = await PollOptionService.GetPollOptionsByPollIdAsync(EntityPoll.Id);
+        PollOptions = await PollOptionService.GetPollOptionsByPollIdAsync(EntityPoll.Id);
     }
     
-    private async Task HandleClick(EntityPollOption option)
+    private async Task HandlePollOptionClick(EntityPollOption option)
     {
-        await ShowAlertMessage();
+        AlertProperties.IsVisible = false;
         
-        
-    }
-
-    private async Task ShowAlertMessage()
-    {
+        // checking if the user is authenticated
         if (_currentUser == null)
         {
-            _alert.Color = Color.Danger;
-            _alertMessage = "You must be logged in to vote.";
-        }
-        else
-        {
-            _alert.Color = Color.Success;
-            _alertMessage = "Vote submitted successfully.";
+            AlertProperties.Message = "please login to vote";
+            AlertProperties.IsVisible = true;
+            return;
         }
 
-        await _alert.Show();
+        // UserVote being null means the user has not voted yet
+        // so we need to create a new vote
+        if (UserVote == null)
+        {
+            UserVote = new Vote
+            {
+                PollId = EntityPoll.Id,
+                UserId = _currentUser.Id,
+                PollOptionId = option.Id
+            };
+            
+            
+        }
+
+        // checking if the user has already voted for the same option
+        //if so return
+        if (UserVote.PollOption == option)
+            return;
     }
 }
