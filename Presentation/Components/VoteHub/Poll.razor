@@ -1,4 +1,3 @@
-@using System.Runtime.InteropServices.JavaScript
 @using Application.Services
 @using EntityPoll = Domain.Entities.Poll;
 @using EntityPollOption = Domain.Entities.PollOption;
@@ -10,6 +9,7 @@
 @inject UserManager<VoteHubUser> UserManager
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IPollOptionService PollOptionService
+@inject IVoteService VoteService
 
 <h3>Poll</h3>
 
@@ -47,6 +47,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        // Getting a user, if not authenticated, _currentUser will be null
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
 
@@ -73,9 +74,13 @@
             AlertProperties.IsVisible = true;
             return;
         }
+        
+        // try to get the existing vote of the user if null
+        UserVote ??= await VoteService.GetVoteByUserAndPollAsync(_currentUser.Id, EntityPoll.Id);
+        
 
         // UserVote being null means the user has not voted yet
-        // so we need to create a new vote
+        // we need to create a new vote
         if (UserVote == null)
         {
             UserVote = new Vote
@@ -84,13 +89,23 @@
                 UserId = _currentUser.Id,
                 PollOptionId = option.Id
             };
-            
-            
+
+            await VoteService.AddVoteAsync(UserVote);
+            await VoteService.SaveChangesAsync();
+
+            //TODO should add something that indicates that vote was successful for the user (maybe alert)
+            return;
         }
 
-        // checking if the user has already voted for the same option
-        //if so return
+        // If the user already voted for this option, don't do anything
         if (UserVote.PollOption == option)
             return;
+        
+        // this piece of code is executed if none of the above conditions are met (meaning the user has already voted and
+        // wishes to change their vote, meaning we need to update the vote)
+
+        await VoteService.UpdateVoteAsync(UserVote);
+        
+        await VoteService.SaveChangesAsync();
     }
 }

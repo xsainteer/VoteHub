@@ -22,6 +22,7 @@ public static class DependencyInjection
 
         services.AddScoped<IPollOptionRepository, PollOptionRepository>();
         services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+        services.AddScoped<IVoteRepository, VoteRepository>();
         
         return services;
     }

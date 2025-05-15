@@ -11,6 +11,7 @@ public static class DependencyInjection
         services.AddScoped<IPollOptionService, PollOptionService>();
         services.AddScoped(typeof(IGenericService<>), typeof(GenericService<>));
         services.AddScoped<IPollService, PollService>();
+        services.AddScoped<IVoteService, VoteService>();
         
         return services;
     }
