@@ -50,10 +50,6 @@ node_modules/
 npm-debug.log
 yarn-error.log
 
-# ASP.NET Core
-appsettings.json
-appsettings.*.json
-
 # Publish files
 publish/
 
