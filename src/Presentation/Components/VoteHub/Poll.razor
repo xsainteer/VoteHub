@@ -37,7 +37,7 @@
     public EntityPoll EntityPoll { get; set; } = new();
     
     [Parameter]
-    private List<EntityPollOption> PollOptions { get; set; } = [];
+    public List<EntityPollOption> PollOptions { get; set; } = [];
     
     private VoteHubUser? _currentUser;
 

@@ -27,11 +27,6 @@ builder.Services.AddApplication();
 
 //Infrastructure services
 builder.Services.AddInfrastructure();
-builder.Services.AddDbContext<VoteHubContext>(options =>
-{
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
-});
-
 
 //Identity 2
 builder.Services.AddCascadingAuthenticationState();
