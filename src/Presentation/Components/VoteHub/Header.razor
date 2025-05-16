@@ -8,24 +8,26 @@
         VoteHub
     </BarBrand>
 
-    <BarToggler />
-
+    <BarToggler/>
     <BarMenu>
         <BarStart>
             <BarItem>
-                <BarLink To="#home">Home</BarLink>
+                <BarLink To="#home">Polls</BarLink>
             </BarItem>
 
             <BarItem>
-                <BarLink To="#docs">Documentation</BarLink>
+                <BarLink To="#docs">News</BarLink>
             </BarItem>
         </BarStart>
 
         <BarEnd>
             <BarItem>
-                <Button To="Account/Register" Color="Color.Primary">Sign up</Button>
-                <Button To="Account/Login" Color="Color.Secondary">Log in</Button>
+                <Button To="Account/Register" Color="Color.Primary" Margin="Margin.Is2">Sign up</Button>
+                <Button To="Account/Login" Color="Color.Secondary" Margin="Margin.Is2">Log in</Button>
             </BarItem>
         </BarEnd>
     </BarMenu>
 </Bar>
+
+@code {
+}

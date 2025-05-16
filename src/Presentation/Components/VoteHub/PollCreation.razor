@@ -10,6 +10,9 @@
 @inject IPollService PollService
 @inject ILogger<PollCreation> Logger
 @inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+@page "/polls/create"
 
 <h3>PollCreation</h3>
 
@@ -21,15 +24,15 @@
                 <FieldLabel>Poll Name</FieldLabel>
                 <TextEdit @bind-Text="Poll.Name"></TextEdit>
             </Field>
-            
+
             <Field>
                 <FieldLabel>Poll Description</FieldLabel>
                 <TextEdit @bind-Text="Poll.Description" Size="Size.Large"></TextEdit>
             </Field>
-            
+
             <Field>
-                <Switch TValue="bool" Checked="_showDatePicker" CheckedChanged="HandleExpiryDateToggle"></Switch>
-                
+                <Switch TValue="bool" @bind-Checked="_showDatePicker"></Switch>
+
                 @if (_showDatePicker)
                 {
                     <Tooltip Text="Click me to choose a date!">
@@ -43,22 +46,22 @@
                 <Alert Color="AlertProperties.Color" @bind-Visible="AlertProperties.IsVisible">
                     <AlertMessage>@AlertProperties.Message</AlertMessage>
                 </Alert>
-                
+
                 <Field>
                     <FieldLabel>Poll Option Name</FieldLabel>
                     <TextEdit @bind-Text="PollOptionCreating.Name"></TextEdit>
                 </Field>
-                
+
                 <Field>
                     <FieldLabel>Poll Option Description</FieldLabel>
                     <TextEdit @bind-Text="PollOptionCreating.Description" Size="Size.Medium"></TextEdit>
                 </Field>
-                
+
                 <Field>
                     <Button Color="Color.Success" Clicked="HandlePollOptionClick">Create Poll Option</Button>
                 </Field>
             </Fields>
-            
+
             @* Poll Options *@
             <Fields>
                 @foreach (var option in Poll.Options)
@@ -69,7 +72,7 @@
                             <TextEdit @bind-Text="option.Name"></TextEdit>
                         </Tooltip>
                     </Field>
-                    
+
                     <Field>
                         <FieldLabel>Poll Option Description</FieldLabel>
                         <Tooltip Text="Can be changed dynamically!">
@@ -78,7 +81,7 @@
                     </Field>
                 }
             </Fields>
-            
+
             @* Submit Button *@
             <Field>
                 <Button Color="Color.Primary" Clicked="HandleSubmit">Create Poll</Button>
@@ -92,14 +95,14 @@
 </AuthorizeView>
 
 @code {
-    private EntityPoll Poll { get; set; } = new();
-    private EntityPollOption PollOptionCreating { get; set; } = new();
+    public EntityPoll Poll { get; set; } = new();
+    public EntityPollOption PollOptionCreating { get; set; } = new();
 
-    private AlertProps AlertProperties { get; set; } = new();
+    public AlertProps AlertProperties { get; set; } = new();
     
-    private bool _showDatePicker = false;
+    public bool _showDatePicker = false;
     
-    private VoteHubUser _currentUser = null!;
+    public VoteHubUser _currentUser = null!;
     
     // getting a user from the authentication state
     protected override async Task OnInitializedAsync()
@@ -123,7 +126,7 @@
     {
         try
         {
-            Poll.Id = _currentUser.Id;
+            Poll.CreatorId = _currentUser.Id;
             
             await PollService.AddAsync(Poll);
         }
@@ -150,16 +153,6 @@
         
         // reset the poll option to make new poll options if needed
         PollOptionCreating = new EntityPollOption();
-    }
-
-    // if user decides to disable the date picker, the poll expiration date should be set to null
-    // (that's why i need this method)
-    private void HandleExpiryDateToggle(bool isChecked)
-    {
-        if (!isChecked)
-        {
-            Poll.ExpiresAt = null;
-        }
     }
     
     //TODO divide all that code into smaller files, looks too big
