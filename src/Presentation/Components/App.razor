@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@using Presentation.Components.VoteHub
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -19,8 +20,12 @@
 </head>
 
 <body>
-<Routes/>
-<script src="_framework/blazor.web.js"></script>
+    <Router AppAssembly="@typeof(Program).Assembly">
+        <Found Context="routeData">
+            <RouteView RouteData="routeData" DefaultLayout="@typeof(MainLayout)" />
+        </Found>
+    </Router>
+    <script src="_framework/blazor.web.js"></script>
 </body>
 
 </html>

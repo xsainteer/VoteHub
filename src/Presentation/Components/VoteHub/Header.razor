@@ -1,0 +1,31 @@
+@using Blazorise
+
+<Bar Breakpoint="Breakpoint.Desktop"
+     Background="Background.Light"
+     ThemeContrast="ThemeContrast.Light">
+
+    <BarBrand>
+        VoteHub
+    </BarBrand>
+
+    <BarToggler />
+
+    <BarMenu>
+        <BarStart>
+            <BarItem>
+                <BarLink To="#home">Home</BarLink>
+            </BarItem>
+
+            <BarItem>
+                <BarLink To="#docs">Documentation</BarLink>
+            </BarItem>
+        </BarStart>
+
+        <BarEnd>
+            <BarItem>
+                <Button To="Account/Register" Color="Color.Primary">Sign up</Button>
+                <Button To="Account/Login" Color="Color.Secondary">Log in</Button>
+            </BarItem>
+        </BarEnd>
+    </BarMenu>
+</Bar>
