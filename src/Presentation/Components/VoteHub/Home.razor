@@ -1,7 +1,29 @@
+@using Blazorise
+
 @page "/"
 
-<h3>Home</h3>
+<PageTitle>VoteHub — Главная</PageTitle>
 
-@code {
-    
-}
+<Layout>
+    <Container Class="text-center mt-5">
+        <Heading Size="HeadingSize.Is1">Welcome to VoteHub</Heading>
+
+        <Paragraph Class="lead mt-3">
+            Simple and easy-to-use platform for creating polls and voting in real time.
+        </Paragraph>
+
+        <Flex JustifyContent="JustifyContent.Center" Class="mt-4">
+            <Link To="polls/create">
+            <Button Color="Color.Primary" Size="Size.Large">
+                <span>Create poll</span>
+            </Button>
+            </Link>
+
+            <Link To="polls">
+            <Button Color="Color.Secondary" Size="Size.Large">
+                <span>See polls</span>
+            </Button>
+            </Link>
+        </Flex>
+    </Container>
+</Layout>

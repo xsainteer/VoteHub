@@ -10,7 +10,6 @@
 @using EntityPollOption = Domain.Entities.PollOption
 @inject IPollService PollService
 @inject ILogger<PollCreation> Logger
-@inject NavigationManager NavigationManager
 @rendermode InteractiveServer
 
 @page "/polls/create"
@@ -70,8 +69,7 @@
 
 @code {
     public EntityPoll Poll { get; set; } = new();
-    public EntityPollOption PollOptionCreating { get; set; } = new();
-
+    
     public AlertProps AlertProperties { get; set; } = new();
     
     public bool _showDatePicker = false;
@@ -110,24 +108,4 @@
             throw;
         }
     }
-    
-    private void HandlePollOptionClick()
-    {
-        //when submitting a new poll option Alert visibility should be reset
-        AlertProperties.IsVisible = false;
-        
-        if (string.IsNullOrWhiteSpace(PollOptionCreating.Name))
-        {
-            AlertProperties.Message = "please fill the poll option name";
-            AlertProperties.IsVisible = true;
-            return;
-        }
-        
-        Poll.Options.Add(PollOptionCreating);
-        
-        // reset the poll option to make new poll options if needed
-        PollOptionCreating = new EntityPollOption();
-    }
-    
-    //TODO divide all that code into smaller files, looks too big
 }
