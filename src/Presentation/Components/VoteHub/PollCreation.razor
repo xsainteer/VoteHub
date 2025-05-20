@@ -1,5 +1,6 @@
 @using Application.Services
 @using Blazorise
+@using Blazorise.DataGrid
 @using Infrastructure.Database.Entities
 @using Microsoft.AspNetCore.Identity
 @using Presentation.Extensions
@@ -47,39 +48,12 @@
                     <AlertMessage>@AlertProperties.Message</AlertMessage>
                 </Alert>
 
-                <Field>
-                    <FieldLabel>Poll Option Name</FieldLabel>
-                    <TextEdit @bind-Text="PollOptionCreating.Name"></TextEdit>
-                </Field>
-
-                <Field>
-                    <FieldLabel>Poll Option Description</FieldLabel>
-                    <TextEdit @bind-Text="PollOptionCreating.Description" Size="Size.Medium"></TextEdit>
-                </Field>
-
-                <Field>
-                    <Button Color="Color.Success" Clicked="HandlePollOptionClick">Create Poll Option</Button>
-                </Field>
-            </Fields>
-
-            @* Poll Options *@
-            <Fields>
-                @foreach (var option in Poll.Options)
-                {
-                    <Field>
-                        <FieldLabel>Poll Option Name</FieldLabel>
-                        <Tooltip Text="Can be changed dynamically!">
-                            <TextEdit @bind-Text="option.Name"></TextEdit>
-                        </Tooltip>
-                    </Field>
-
-                    <Field>
-                        <FieldLabel>Poll Option Description</FieldLabel>
-                        <Tooltip Text="Can be changed dynamically!">
-                            <TextEdit @bind-Text="option.Description" Size="Size.Medium"></TextEdit>
-                        </Tooltip>
-                    </Field>
-                }
+            
+                <DataGrid TItem="EntityPollOption" Data="Poll.Options" PageSize="5" Responsive Editable Filterable>
+                    <DataGridColumn Field="@nameof(EntityPollOption.Name)" Caption="Name" Editable />
+                    <DataGridColumn Field="@nameof(EntityPollOption.Description)" Caption="Description" Editable />
+                    <DataGridCommandColumn />
+                </DataGrid>
             </Fields>
 
             @* Submit Button *@

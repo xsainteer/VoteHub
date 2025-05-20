@@ -8,7 +8,7 @@ public class PollOption : IHasId, IHasName
     
     public string Name { get; set; } = null!;
     
-    public string Description { get; set; } = null!;
+    public string? Description { get; set; }
     
     public Guid PollId { get; set; }
     public Poll Poll { get; set; } = null!;
