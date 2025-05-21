@@ -7,29 +7,18 @@ namespace Infrastructure.Database.Repositories;
 
 public class PollOptionRepository : GenericRepository<PollOption>, IPollOptionRepository
 {
-    private readonly VoteHubContext _context;
-    private readonly ILogger<PollOptionRepository> _logger;
-
-
-    public PollOptionRepository(VoteHubContext context, ILogger<GenericRepository<PollOption>> logger, ILogger<PollOptionRepository> logger2) : base(context, logger)
+    public PollOptionRepository(VoteHubContext context, ILogger<PollOptionRepository> logger) : base(context, logger)
     {
-        _context = context;
-        _logger = logger2;
     }
 
-    public async Task<List<PollOption>> GetPollOptionsByPollIdAsync(Guid pollId)
+    public async Task<List<PollOption>> GetPollOptionsByPollIdAsync(Guid pollId, bool asNoTracking = false)
     {
-        try
-        {
-            var pollOptions = await _context.PollOptions
-                .Where(x => x.PollId == pollId)
-                .ToListAsync();
-            return pollOptions;
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "Error fetching poll options for poll ID {PollId}", pollId);
-            throw;
-        }
+        _logger.LogInformation("Fetching poll options for poll ID {PollId}", pollId);
+        
+        var queryable = asNoTracking ? _dbSet.AsNoTracking() : _dbSet;
+        
+        return await queryable
+            .Where(p => p.PollId == pollId)
+            .ToListAsync();
     }
 }

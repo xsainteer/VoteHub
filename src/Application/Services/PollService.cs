@@ -7,14 +7,27 @@ namespace Application.Services;
 
 public interface IPollService : IGenericService<Poll>
 {
-    // additional methods if needed
+    Task<Poll?> GetPollWithOptionsAsync(Guid pollId);
 }
 
 public class PollService : GenericService<Poll>, IPollService
 {
-    public PollService(IGenericRepository<Poll> repository, ILogger<GenericService<Poll>> logger) : base(repository, logger)
+    private readonly IPollRepository _pollRepository;
+    public PollService(IPollRepository repository, ILogger<PollService> logger) : base(repository, logger)
     {
+        _pollRepository = repository;
     }
     
-    // additional methods if needed
+    public async Task<Poll?> GetPollWithOptionsAsync(Guid pollId)
+    {
+        try
+        {
+            return await _pollRepository.GetPollWithOptionsAsync(pollId);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("Error while getting poll with options: {Message}", e.Message);
+            throw;
+        }
+    }
 }

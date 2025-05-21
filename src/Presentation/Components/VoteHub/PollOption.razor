@@ -13,7 +13,7 @@
 
 @code {
     [Parameter]
-    public static EntityPollOption Option { get; set; } = new();
+    public EntityPollOption Option { get; set; } = new();
     
     [Parameter]
     public EventCallback<EntityPollOption> OnClick { get; set; }

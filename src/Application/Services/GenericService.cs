@@ -32,7 +32,7 @@ public class GenericService<T> : IGenericService<T> where T : IHasId, IHasName
     }
 
     
-    public async Task<List<T>> GetAllAsync(int skip = 0, int count = 10, bool asNoTracking = false, string? query = "")
+    public async Task<List<T>> GetAllAsync(int page = 1, int pageCount = 10, bool asNoTracking = false, string? query = "")
     {
         try
         {
@@ -40,22 +40,22 @@ public class GenericService<T> : IGenericService<T> where T : IHasId, IHasName
         
             if (!string.IsNullOrWhiteSpace(query))
             {
-                entities = await _repository.GetAllAsync(skip, count, asNoTracking, query);
+                entities = await _repository.GetAllAsync(page, pageCount, asNoTracking, query);
             }
             else
             {
-                entities = await _repository.GetAllAsync(skip, count, asNoTracking);
+                entities = await _repository.GetAllAsync(page, pageCount, asNoTracking);
             }
             
             if (entities.Count == 0)
             {
-                _logger.LogInformation("No {Entity} entities found (Skip: {Skip}, Count: {Count}, Query: '{Query}')", 
-                    typeof(T).Name, skip, count, query);
+                _logger.LogInformation("No {Entity} entities found (Page: {Page}, Count: {Count}, Query: '{Query}')", 
+                    typeof(T).Name, page, pageCount, query);
             }
             else
             {
-                _logger.LogDebug("Retrieved {Count} {Entity} entities (Skip: {Skip})", 
-                    entities.Count, typeof(T).Name, skip);
+                _logger.LogDebug("Retrieved {Count} {Entity} entities (Page: {Page})", 
+                    entities.Count, typeof(T).Name, page);
             }
 
             return entities;

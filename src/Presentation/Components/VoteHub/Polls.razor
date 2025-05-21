@@ -1,8 +1,41 @@
+@using Application.Interfaces
+@using Application.Services
+@using EntityPoll = Domain.Entities.Poll
+
+@inject IPollService PollService
+
 @page "/Polls"
+@page "/Polls/{Query}"
 <h3>Polls</h3>
 
+@if (EntityPolls != null && EntityPolls.Any())
+{
+    @foreach(var poll in EntityPolls)
+    {
+        <Poll EntityPoll="poll"></Poll>
+    }
+}
+else
+{
+    <p>No polls available.</p>
+}
 
 
 @code {
+    [Parameter]
+    [SupplyParameterFromQuery] 
+    public int Page { get; set; } = 1;
     
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string? Query { get; set; }
+
+    private List<EntityPoll>? EntityPolls { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Page <= 0) Page = 1;
+
+        EntityPolls = await PollService.GetAllAsync(Page, 10, false, Query);
+    }
 }

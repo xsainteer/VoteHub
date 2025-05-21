@@ -6,7 +6,7 @@ namespace Application.Services;
 
 public interface IPollOptionService
 {
-    Task<List<PollOption>> GetPollOptionsByPollIdAsync(Guid pollId);
+    Task<List<PollOption>> GetPollOptionsByPollIdAsync(Guid pollId, bool asNoTracking = false);
 }
 
 public class PollOptionService : GenericService<PollOption>, IPollOptionService
@@ -21,11 +21,11 @@ public class PollOptionService : GenericService<PollOption>, IPollOptionService
         _pollOptionRepository = pollOptionRepository;
     }
 
-    public async Task<List<PollOption>> GetPollOptionsByPollIdAsync(Guid pollId)
+    public async Task<List<PollOption>> GetPollOptionsByPollIdAsync(Guid pollId, bool asNoTracking = false)
     {
         try
         {
-            return await _pollOptionRepository.GetPollOptionsByPollIdAsync(pollId);
+            return await _pollOptionRepository.GetPollOptionsByPollIdAsync(pollId, asNoTracking);
         }
         catch (Exception e)
         {

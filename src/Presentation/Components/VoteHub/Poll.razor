@@ -5,11 +5,13 @@
 @using Domain.Entities
 @using Infrastructure.Database.Entities
 @using Microsoft.AspNetCore.Identity
+@using Presentation.Components.Account
 @using Presentation.Extensions
 @inject UserManager<VoteHubUser> UserManager
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IPollOptionService PollOptionService
 @inject IVoteService VoteService
+@inject IdentityUserAccessor UserAccessor
 
 <h3>Poll</h3>
 
@@ -25,7 +27,7 @@
     </CardHeader>
 
     <Fields>
-        @foreach (var option in PollOptions)
+        @foreach (var option in EntityPoll.Options)
         {
             <PollOption Option="@option" OnClick="HandlePollOptionClick"/>
         }
@@ -36,9 +38,6 @@
     [Parameter]
     public EntityPoll EntityPoll { get; set; } = new();
     
-    [Parameter]
-    public List<EntityPollOption> PollOptions { get; set; } = [];
-    
     private VoteHubUser? _currentUser;
 
     private Vote? UserVote { get; set; }
@@ -47,20 +46,15 @@
 
     protected override async Task OnInitializedAsync()
     {
-        // Getting a user, if not authenticated, _currentUser will be null
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-
-        if (user.Identity?.IsAuthenticated == true)
-        {
-            _currentUser = await UserManager.GetUserAsync(user);
-        }
-        else
-        {
-            _currentUser = null;
-        }
+        // var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        // var user = authState.User;
+        //
+        // if (user.Identity?.IsAuthenticated == true)
+        // {
+        //     _currentUser = await UserManager.GetUserAsync(user);
+        // }
         
-        PollOptions = await PollOptionService.GetPollOptionsByPollIdAsync(EntityPoll.Id);
+        // TODO error about one instance of dbcontext being used by multiple threads, gotta fix this
     }
     
     private async Task HandlePollOptionClick(EntityPollOption option)

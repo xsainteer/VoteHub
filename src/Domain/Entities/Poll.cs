@@ -14,6 +14,6 @@ public class Poll : IHasId, IHasName
     
     public Guid CreatorId { get; set; }
     
-    public ICollection<PollOption> Options { get; set; } = [];
+    public ICollection<PollOption> Options { get; set; } = null!;
     public ICollection<Vote> Participants { get; set; } = null!;
 }
