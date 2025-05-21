@@ -57,4 +57,37 @@ public class VoteRepository : IVoteRepository
         
         entry.State = EntityState.Modified;
     }
+    
+    public async Task<int> GetUserVotesTotalCountAsync(Guid userId)
+    {
+        _logger.LogInformation("Getting total votes count for UserId: {UserId}", userId);
+        
+        var count = await _dbSet.CountAsync(v => v.UserId == userId);
+        
+        return count;
+    }
+
+    public async Task<List<Vote>> GetVotesByUserIdAsync(Guid userId)
+    {
+        _logger.LogInformation("Getting votes for UserId: {UserId}", userId);
+        
+        var votes = await _dbSet
+            .AsNoTracking()
+            .Where(v => v.UserId == userId)
+            .ToListAsync();
+
+        return votes;
+    }
+    
+    public async Task<List<Vote>> GetVotesByPollIdAsync(Guid pollId)
+    {
+        _logger.LogInformation("Getting votes for PollId: {PollId}", pollId);
+        
+        var votes = await _dbSet
+            .AsNoTracking()
+            .Where(v => v.PollId == pollId)
+            .ToListAsync();
+
+        return votes;
+    }
 }

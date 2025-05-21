@@ -11,5 +11,8 @@ public interface IVoteRepository
     public Task SavesChangesAsync();
     Task<Vote?> GetVoteByUserAndPollAsync(Guid currentUserId, Guid entityPollId);
     Task UpdateAsync(Vote userVote);
+    Task<int> GetUserVotesTotalCountAsync(Guid userId);
+    Task<List<Vote>> GetVotesByUserIdAsync(Guid userId);
+    Task<List<Vote>> GetVotesByPollIdAsync(Guid pollId);
 }
 
