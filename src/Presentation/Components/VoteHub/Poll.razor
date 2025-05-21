@@ -38,74 +38,20 @@
     [Parameter]
     public EntityPoll EntityPoll { get; set; } = new();
     
-    private VoteHubUser? _currentUser;
-
-    private Vote? UserVote { get; set; }
+    [Parameter]
+    public VoteHubUser? CurrentUser { get; set; }
 
     AlertProps AlertProperties { get; set; } = new();
-
-    protected override async Task OnInitializedAsync()
-    {
-        // var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        // var user = authState.User;
-        //
-        // if (user.Identity?.IsAuthenticated == true)
-        // {
-        //     _currentUser = await UserManager.GetUserAsync(user);
-        // }
-        
-        // TODO error about one instance of dbcontext being used by multiple threads, gotta fix this
-    }
+    
     
     private async Task HandlePollOptionClick(EntityPollOption option)
     {
-        AlertProperties.IsVisible = false;
-        
-        // checking if the user is authenticated
-        if (_currentUser == null)
+        var newVote = new Vote
         {
-            AlertProperties.Message = "please login to vote";
-            AlertProperties.IsVisible = true;
-            return;
-        }
-        
-        // trying to get the existing vote of the user if user's null
-        UserVote ??= await VoteService.GetVoteByUserAndPollAsync(_currentUser.Id, EntityPoll.Id);
-        
-
-        // UserVote still being null means the user has not voted yet
-        // we need to create a new vote
-        if (UserVote == null)
-        {
-            UserVote = new Vote
-            {
-                PollId = EntityPoll.Id,
-                UserId = _currentUser.Id,
-                PollOptionId = option.Id
-            };
-
-            await VoteService.AddVoteAsync(UserVote);
-            await VoteService.SaveChangesAsync();
-
-            AlertProperties.Message = "successfully voted";
-            AlertProperties.Color = Color.Success;
-            AlertProperties.IsVisible = true;
-            return;
-        }
-
-        // If the user already voted for this option, don't do anything
-        if (UserVote.PollOption == option)
-            return;
-        
-        // this piece of code is executed if none of the above conditions are met (meaning the user has already voted and
-        // wishes to change their vote, meaning we need to update the vote)
-
-        await VoteService.UpdateVoteAsync(UserVote);
-        
-        AlertProperties.Message = "successfully updated your vote";
-        AlertProperties.Color = Color.Success;
-        AlertProperties.IsVisible = true;
-        
-        await VoteService.SaveChangesAsync();
+            PollOptionId = option.Id,
+            UserId = CurrentUser?.Id ?? throw new InvalidOperationException("User not found"),
+            PollId = EntityPoll.Id,
+            VotedAt = DateTime.Now
+        };
     }
 }

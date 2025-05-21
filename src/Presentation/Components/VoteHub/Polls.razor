@@ -1,8 +1,13 @@
 @using Application.Interfaces
 @using Application.Services
+@using Infrastructure.Database.Entities
+@using Microsoft.AspNetCore.Identity
 @using EntityPoll = Domain.Entities.Poll
 
+@inject UserManager<VoteHubUser> UserManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IPollService PollService
+@inject IPollOptionService PollOptionService
 
 @page "/Polls"
 @page "/Polls/{Query}"
@@ -12,7 +17,7 @@
 {
     @foreach(var poll in EntityPolls)
     {
-        <Poll EntityPoll="poll"></Poll>
+        <Poll EntityPoll="poll" CurrentUser="CurrentUser"></Poll>
     }
 }
 else
@@ -31,11 +36,26 @@ else
     public string? Query { get; set; }
 
     private List<EntityPoll>? EntityPolls { get; set; }
+    
+    private VoteHubUser? CurrentUser { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity?.IsAuthenticated == true)
+        {
+            CurrentUser = await UserManager.GetUserAsync(user);
+        }
+        
         if (Page <= 0) Page = 1;
 
         EntityPolls = await PollService.GetAllAsync(Page, 10, false, Query);
+
+        foreach (var poll in EntityPolls)
+        {
+            poll.Options = await PollOptionService.GetPollOptionsByPollIdAsync(poll.Id, true);
+        }
     }
 }
