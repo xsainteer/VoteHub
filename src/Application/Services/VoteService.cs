@@ -10,6 +10,7 @@ public interface IVoteService
     Task<Vote?> GetVoteByUserAndPollAsync(Guid currentUserId, Guid entityPollId);
     Task SaveChangesAsync();
     Task UpdateVoteAsync(Vote userVote);
+    Task<int> GetVotesCountByPollOptionIdAsync(Guid pollOptionId);
 }
 
 public class VoteService : IVoteService
@@ -73,6 +74,19 @@ public class VoteService : IVoteService
         catch (Exception e)
         {
             _logger.LogError("Error updating vote: {Message}", e.Message);
+            throw;
+        }
+    }
+
+    public async Task<int> GetVotesCountByPollOptionIdAsync(Guid pollOptionId)
+    {
+        try
+        {
+            return await _voteRepository.GetUserVotesTotalCountAsync(pollOptionId);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("Error fetching votes count: {Message}", e.Message);
             throw;
         }
     }

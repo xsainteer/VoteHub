@@ -14,5 +14,5 @@ public interface IVoteRepository
     Task<int> GetUserVotesTotalCountAsync(Guid userId);
     Task<List<Vote>> GetVotesByUserIdAsync(Guid userId);
     Task<List<Vote>> GetVotesByPollIdAsync(Guid pollId);
+    Task<int> GetVotesCountByPollOptionIdAsync(Guid pollOptionId);
 }
-

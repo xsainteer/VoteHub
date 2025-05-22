@@ -90,4 +90,12 @@ public class VoteRepository : IVoteRepository
 
         return votes;
     }
+    
+    public async Task<int> GetVotesCountByPollOptionIdAsync(Guid pollOptionId)
+    {
+        _logger.LogInformation("Fetching votes count for poll option ID {PollOptionId}", pollOptionId);
+        
+        return await _dbSet
+            .CountAsync(v => v.PollOptionId == pollOptionId);
+    }
 }
