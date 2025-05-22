@@ -41,7 +41,7 @@ public class StatisticsService : IStatisticsService
     {
         try
         {
-            var userVotes = await _voteRepository.GetVotesByUserIdAsync(userId);
+            var userVotes = await _voteRepository.GetVotesAsync(v => v.UserId == userId, true);
             
             var pollIds = userVotes.Select(v => v.PollId).Distinct();
 
@@ -50,7 +50,7 @@ public class StatisticsService : IStatisticsService
             
             foreach (var pollId in pollIds)
             {
-                var pollVotes = await _voteRepository.GetVotesByPollIdAsync(pollId);
+                var pollVotes = await _voteRepository.GetVotesAsync(v => v.PollId == pollId, true);
 
                 var groups = pollVotes.GroupBy(v => v.PollOptionId)
                     .Select(g => new { OptionId = g.Key, Count = g.Count() });

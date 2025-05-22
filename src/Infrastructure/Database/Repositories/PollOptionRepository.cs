@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Application.Repositories;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -11,14 +12,14 @@ public class PollOptionRepository : GenericRepository<PollOption>, IPollOptionRe
     {
     }
 
-    public async Task<List<PollOption>> GetPollOptionsByPollIdAsync(Guid pollId, bool asNoTracking = false)
+    public async Task<List<PollOption>> GetPollOptionsAsync(Expression<Func<PollOption, bool>> predicate, bool asNoTracking = false)
     {
-        _logger.LogInformation("Fetching poll options for poll ID {PollId}", pollId);
+        _logger.LogInformation("Getting poll options with predicate: {Predicate}", predicate);
         
         var queryable = asNoTracking ? _dbSet.AsNoTracking() : _dbSet;
         
         return await queryable
-            .Where(p => p.PollId == pollId)
+            .Where(predicate)
             .ToListAsync();
     }
 }

@@ -7,7 +7,7 @@ namespace Application.Services;
 public interface IVoteService
 {
     Task AddVoteAsync(Vote vote);
-    Task<Vote?> GetVoteByUserAndPollAsync(Guid currentUserId, Guid entityPollId);
+    Task<Vote?> GetVoteByUserIdAndPollIdAsync(Guid currentUserId, Guid entityPollId);
     Task SaveChangesAsync();
     Task UpdateVoteAsync(Vote userVote);
     Task<int> GetVotesCountByPollOptionIdAsync(Guid pollOptionId);
@@ -38,11 +38,11 @@ public class VoteService : IVoteService
         }
     }
 
-    public async Task<Vote?> GetVoteByUserAndPollAsync(Guid currentUserId, Guid entityPollId)
+    public async Task<Vote?> GetVoteByUserIdAndPollIdAsync(Guid currentUserId, Guid entityPollId)
     {
         try
         {
-            var vote = await _voteRepository.GetVoteByUserAndPollAsync(currentUserId, entityPollId);
+            var vote = await _voteRepository.GetVoteAsync(v => v.UserId == currentUserId && v.PollId == entityPollId, true);
             return vote;
         }
         catch (Exception e)

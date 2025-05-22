@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Application.Repositories;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -30,17 +31,6 @@ public class VoteRepository : IVoteRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task<Vote?> GetVoteByUserAndPollAsync(Guid currentUserId, Guid entityPollId)
-    {
-        _logger.LogInformation("Getting vote for UserId: {UserId}, PollId: {PollId}",
-            currentUserId, entityPollId);
-        
-        
-        var vote = await _dbSet.FindAsync(currentUserId, entityPollId);
-        
-        return vote;
-    }
-
     public async Task UpdateAsync(Vote userVote)
     {
         // Maybe sometime i will make a method for updating specific properties instead of a whole entity for optimization
@@ -67,30 +57,28 @@ public class VoteRepository : IVoteRepository
         return count;
     }
 
-    public async Task<List<Vote>> GetVotesByUserIdAsync(Guid userId)
+    public async Task<List<Vote>> GetVotesAsync(Expression<Func<Vote, bool>> predicate, bool asNoTracking = false)
     {
-        _logger.LogInformation("Getting votes for UserId: {UserId}", userId);
+        _logger.LogInformation("Getting votes with custom predicate: {Predicate}", predicate);
         
-        var votes = await _dbSet
-            .AsNoTracking()
-            .Where(v => v.UserId == userId)
+        var queryable = asNoTracking ? _dbSet.AsNoTracking() : _dbSet;
+        
+        return await queryable
+            .Where(predicate)
             .ToListAsync();
-
-        return votes;
     }
-    
-    public async Task<List<Vote>> GetVotesByPollIdAsync(Guid pollId)
+
+    public async Task<Vote> GetVoteAsync(Expression<Func<Vote, bool>> predicate, bool asNoTracking = false)
     {
-        _logger.LogInformation("Getting votes for PollId: {PollId}", pollId);
+        _logger.LogInformation("Getting a vote with custom predicate: {Predicate}", predicate);
         
-        var votes = await _dbSet
-            .AsNoTracking()
-            .Where(v => v.PollId == pollId)
-            .ToListAsync();
-
-        return votes;
+        var queryable = asNoTracking ? _dbSet.AsNoTracking() : _dbSet;
+        
+        return await queryable
+            .Where(predicate)
+            .FirstAsync();
     }
-    
+
     public async Task<int> GetVotesCountByPollOptionIdAsync(Guid pollOptionId)
     {
         _logger.LogInformation("Fetching votes count for poll option ID {PollOptionId}", pollOptionId);

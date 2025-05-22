@@ -67,7 +67,7 @@
         }
         
         // trying to get the existing vote of the user if user's null
-        UserVote ??= await VoteService.GetVoteByUserAndPollAsync(CurrentUser.Id, EntityPoll.Id);
+        UserVote ??= await VoteService.GetVoteByUserIdAndPollIdAsync(CurrentUser.Id, EntityPoll.Id);
         
 
         // UserVote still being null means the user has not voted yet

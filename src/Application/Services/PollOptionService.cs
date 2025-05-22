@@ -25,7 +25,7 @@ public class PollOptionService : GenericService<PollOption>, IPollOptionService
     {
         try
         {
-            return await _pollOptionRepository.GetPollOptionsByPollIdAsync(pollId, asNoTracking);
+            return await _pollOptionRepository.GetPollOptionsAsync(po => po.PollId == pollId, asNoTracking);
         }
         catch (Exception e)
         {
