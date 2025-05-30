@@ -9,21 +9,31 @@
 @inject IPollService PollService
 @inject IPollOptionService PollOptionService
 
+
 @page "/Polls"
 @page "/Polls/{Query}"
-<h3>Polls</h3>
 
-@if (EntityPolls != null && EntityPolls.Any())
-{
-    @foreach(var poll in EntityPolls)
+<div class="polls-container">
+    <h2 class="polls-header mb-4">Available Polls</h2>
+
+    @if (EntityPolls != null && EntityPolls.Any())
     {
-        <Poll EntityPoll="poll" CurrentUser="CurrentUser"></Poll>
+        <div class="poll-grid">
+            @foreach(var poll in EntityPolls)
+            {
+                <Poll EntityPoll="poll" CurrentUser="CurrentUser"></Poll>
+            }
+        </div>
     }
-}
-else
-{
-    <p>No polls available.</p>
-}
+    else
+    {
+        <div class="no-polls-message">
+            <i class="fas fa-clipboard-list"></i>
+            <p>No polls available at the moment.</p>
+        </div>
+    }
+</div>
+
 
 
 @code {

@@ -101,4 +101,8 @@
       <AdditionalFiles Include="Components\Account\Shared\StatusMessage.razor" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Controllers\" />
+    </ItemGroup>
+
 </Project>

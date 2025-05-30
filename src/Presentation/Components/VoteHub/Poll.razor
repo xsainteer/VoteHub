@@ -13,43 +13,43 @@
 @inject IVoteService VoteService
 @inject IdentityUserAccessor UserAccessor
 
-<h3>Poll</h3>
+<Card class="poll-card">
+    <CardHeader class="poll-header">
+        <CardTitle class="poll-title">@EntityPoll.Name</CardTitle>
+        <CardSubtitle class="poll-description">@EntityPoll.Description</CardSubtitle>
 
-<Card>
-    <CardHeader>
-        <CardTitle>@EntityPoll.Name</CardTitle>
-        
-        <CardSubtitle>@EntityPoll.Description</CardSubtitle>
-        
-        <Alert bind-Visible="AlertProperties.IsVisible" Color="AlertProperties.Color">
-            <AlertMessage>@AlertProperties.Message</AlertMessage>
-        </Alert>
+        @if (AlertProperties.IsVisible)
+        {
+            <Alert Color="@AlertProperties.Color" class="poll-alert">
+                <i class="fas fa-info-circle me-2"></i>
+                @AlertProperties.Message
+            </Alert>
+        }
     </CardHeader>
 
-    <Fields>
+    <Fields class="poll-options">
         @foreach (var option in EntityPoll.Options)
         {
-            <PollOption Option="@option" OnClick="HandlePollOptionClick"/>
+            <PollOption Option="@option" OnClick="HandlePollOptionClick" />
         }
     </Fields>
 </Card>
 
+
 @code {
-    [Parameter]
-    public EntityPoll EntityPoll { get; set; } = new();
-    
-    [Parameter]
-    public VoteHubUser? CurrentUser { get; set; }
+    [Parameter] public EntityPoll EntityPoll { get; set; } = new();
+
+    [Parameter] public VoteHubUser? CurrentUser { get; set; }
 
     private Vote? UserVote { get; set; }
 
     AlertProps AlertProperties { get; set; } = new();
-    
-    
+
+
     private async Task HandlePollOptionClick(EntityPollOption option)
     {
         AlertProperties.IsVisible = false;
-        
+
         // checking if the user is authenticated
         if (CurrentUser == null)
         {
@@ -57,7 +57,7 @@
             AlertProperties.IsVisible = true;
             return;
         }
-        
+
         // checking if the user is the owner of the poll
         if (EntityPoll.CreatorId == CurrentUser.Id)
         {
@@ -65,10 +65,10 @@
             AlertProperties.IsVisible = true;
             return;
         }
-        
+
         // trying to get the existing vote of the user if user's null
         UserVote ??= await VoteService.GetVoteByUserIdAndPollIdAsync(CurrentUser.Id, EntityPoll.Id);
-        
+
 
         // UserVote still being null means the user has not voted yet
         // we need to create a new vote
@@ -93,16 +93,16 @@
         // If the user already voted for this option, don't do anything
         if (UserVote.PollOption == option)
             return;
-        
+
         // this piece of code is executed if none of the above conditions are met (meaning the user has already voted and
         // wishes to change their vote, meaning we need to update the vote)
 
         await VoteService.UpdateVoteAsync(UserVote);
-        
+
         AlertProperties.Message = "successfully updated your vote";
         AlertProperties.Color = Color.Success;
         AlertProperties.IsVisible = true;
-        
+
         await VoteService.SaveChangesAsync();
     }
 }
