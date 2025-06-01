@@ -82,7 +82,19 @@ public class GenericService<T> : IGenericService<T> where T : IHasId, IHasName
         }
     }
 
-    
+    public async Task AddRangeAsync(IEnumerable<T> entities)
+    {
+        try
+        {
+            await _repository.AddRangeAsync(entities);
+            await _repository.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("Error while creating multiple {Entity} entities: {ErrorMessage}", typeof(T).Name, ex.Message);
+        }
+    }
+
     public async Task UpdateAsync(T entity)
     {
         try

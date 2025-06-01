@@ -10,4 +10,5 @@ public interface IGenericService<T> where T : IHasId, IHasName
     Task AddAsync(T entity);
     Task UpdateAsync(T entity);
     Task DeleteAsync(Guid id);
+    Task AddRangeAsync(IEnumerable<T> entities);
 }

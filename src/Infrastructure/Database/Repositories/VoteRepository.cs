@@ -18,7 +18,7 @@ public class VoteRepository : IVoteRepository
         _context = context;
         _dbSet = context.Set<Vote>();
     }
-
+    
     public async Task AddAsync(Vote vote)
     {
         _logger.LogInformation("Adding vote for PollId: {PollId}, PollOptionId: {PollOptionId}, UserId: {UserId}", 
@@ -85,5 +85,19 @@ public class VoteRepository : IVoteRepository
         
         return await _dbSet
             .CountAsync(v => v.PollOptionId == pollOptionId);
+    }
+    public async Task DeleteAsync(Guid voteId)
+    {
+        _logger.LogInformation("Deleting vote with ID: {VoteId}", voteId);
+
+        var vote = await _dbSet.FindAsync(voteId);
+        if (vote != null)
+        {
+            _dbSet.Remove(vote);
+        }
+        else
+        {
+            _logger.LogWarning("Vote with ID: {VoteId} not found", voteId);
+        }
     }
 }

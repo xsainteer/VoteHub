@@ -5,7 +5,7 @@
 
 <div class="poll-option">
     <Tooltip Text="@Option.Description" Placement="TooltipPlacement.Top">
-        <Button Color="Color.Primary" Class="poll-option-btn" Clicked="HandleClick">
+        <Button Color="Color.Primary" Class="poll-option-btn" Clicked="@HandleClick">
             <span class="option-text">@Option.Name</span>
             <i class="fas fa-vote-yea option-icon"></i>
         </Button>
@@ -20,5 +20,8 @@
     [Parameter]
     public EventCallback<EntityPollOption> OnClick { get; set; }
     
-    private async Task HandleClick() => await OnClick.InvokeAsync(Option);
+    private async Task HandleClick()
+    {
+        await OnClick.InvokeAsync(Option);
+    }
 }
