@@ -3,6 +3,7 @@ using Application;
 using Infrastructure;
 using Infrastructure.Database;
 using Infrastructure.Database.Entities;
+using Infrastructure.Vector;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
@@ -36,12 +37,20 @@ builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
 builder.Services.AddAutoMapper(typeof(MapperProfile).Assembly);
 
-builder.Services.AddInfrastructure();
+builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
 
 
 var app = builder.Build();
 
+// Ensuring collection exists
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var vectorService = services.GetRequiredService<VectorService>();
+
+    await vectorService.EnsureCollectionExistsAsync();
+}
 
 app.UseRouting();
 

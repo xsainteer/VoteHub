@@ -53,8 +53,6 @@ public class VectorService
     {
         try
         {
-            await EnsureCollectionExistsAsync();
-            
             var embedding = await _ollamaClient.GenerateEmbeddingAsync(description);
             
             if (embedding == null || embedding.Length != _qDrantSettings.VectorSize)
@@ -101,8 +99,6 @@ public class VectorService
     {
         try
         {
-            await EnsureCollectionExistsAsync();
-
             var filter = new Filter();
 
             var queryEmbedding = await _ollamaClient.GenerateEmbeddingAsync(query);

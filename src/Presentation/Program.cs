@@ -26,7 +26,7 @@ builder.Services.AddDbContext<VoteHubContext>(options =>
 builder.Services.AddApplication();
 
 //Infrastructure services
-builder.Services.AddInfrastructure();
+builder.Services.AddInfrastructure(builder.Configuration);
 
 //Identity 2
 builder.Services.AddCascadingAuthenticationState();
