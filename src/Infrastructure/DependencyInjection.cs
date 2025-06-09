@@ -1,13 +1,17 @@
 using Application.Repositories;
 using Infrastructure.AI;
+using Infrastructure.Database;
+using Infrastructure.Database.Entities;
 using Infrastructure.Database.Repositories;
 using Infrastructure.Email;
 using Infrastructure.Vector;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Qdrant.Client;
+using RabbitMQ.Client;
 
 namespace Infrastructure;
 
@@ -15,6 +19,20 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
+        // Authentication and Identity
+        services.AddIdentityCore<VoteHubUser>(options => 
+                options.SignIn.RequireConfirmedAccount = configuration.GetValue("SignIn.RequireConfirmedAccount", false))
+            .AddEntityFrameworkStores<VoteHubContext>()
+            .AddSignInManager()
+            .AddDefaultTokenProviders();
+        
+        services.AddAuthentication(options =>
+            {
+                options.DefaultScheme = IdentityConstants.ApplicationScheme;
+                options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
+            })
+            .AddIdentityCookies();
+        
         services.AddOptions<SmtpSettings>()
             .BindConfiguration("Smtp")
             .ValidateDataAnnotations()
@@ -52,6 +70,15 @@ public static class DependencyInjection
         });
         
         services.AddScoped<VectorService>();
+
+        services.AddSingleton<IConnectionFactory>(sp =>
+        {
+            var options = sp.GetRequiredService<IOptions<QDrantSettings>>().Value;
+            return new ConnectionFactory
+            {
+                HostName = options.Host
+            };
+        });
         
         return services;
     }

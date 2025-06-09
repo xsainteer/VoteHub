@@ -35,19 +35,6 @@ builder.Services.AddScoped<IdentityRedirectManager>();
 builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
 
 
-builder.Services.AddAuthentication(options =>
-    {
-        options.DefaultScheme = IdentityConstants.ApplicationScheme;
-        options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
-    })
-    .AddIdentityCookies();
-
-builder.Services.AddIdentityCore<VoteHubUser>(options => 
-        options.SignIn.RequireConfirmedAccount = builder.Configuration.GetValue("SignIn.RequireConfirmedAccount", false))
-    .AddEntityFrameworkStores<VoteHubContext>()
-    .AddSignInManager()
-    .AddDefaultTokenProviders();
-
 builder.Services.AddSingleton<IEmailSender<VoteHubUser>, SmtpEmailSender>();
 
 // Blazorise
