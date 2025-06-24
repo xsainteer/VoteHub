@@ -9,4 +9,7 @@ public class CachedPoll
     public DateTime? ExpiresAt { get; set; }
     public Guid CreatorId { get; set; }
     public ICollection<CachedPollOption> Options { get; set; } = new List<CachedPollOption>();
+    
+    // The total number of votes across all options in the poll
+    public int VotesCount => Options.Sum(option => option.VotesCount);
 }
