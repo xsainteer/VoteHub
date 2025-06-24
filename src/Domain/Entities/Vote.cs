@@ -16,5 +16,5 @@ public class Vote
     [Required]
     public Guid UserId { get; set; }
     
-    public DateTime VotedAt { get; set; }
+    public DateTime VotedAt { get; set; } = DateTime.Now.ToUniversalTime();
 }

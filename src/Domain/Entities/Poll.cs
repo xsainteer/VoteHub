@@ -12,8 +12,7 @@ public class Poll : IHasId, IHasName
     [StringLength(100)]
     public string Name { get; set; } = null!;
     
-    [StringLength(500)]
-    public string Description { get; set; } = null!;
+    public string? Description { get; set; }
 
     [Required]
     public DateTime CreatedAt { get; set; } = DateTime.Now.ToUniversalTime();

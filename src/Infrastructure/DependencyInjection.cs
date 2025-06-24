@@ -33,6 +33,7 @@ public static class DependencyInjection
             })
             .AddIdentityCookies();
         
+        // SMTP
         services.AddOptions<SmtpSettings>()
             .BindConfiguration("Smtp")
             .ValidateDataAnnotations()
@@ -44,11 +45,13 @@ public static class DependencyInjection
                 return !string.IsNullOrWhiteSpace(settings.Host);
             }, "Invalid SMTP configuration");
 
+        // Database
         services.AddScoped<IPollOptionRepository, PollOptionRepository>();
         services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
         services.AddScoped<IVoteRepository, VoteRepository>();
         services.AddScoped<IPollRepository, PollRepository>();
         
+        // AI and Vector search engine
         services.Configure<QDrantSettings>(configuration.GetSection("QDrantSettings"));
         services.Configure<OllamaSettings>(configuration.GetSection("OllamaSettings"));
         services.AddScoped<OllamaClient>();
@@ -71,6 +74,8 @@ public static class DependencyInjection
         
         services.AddScoped<VectorService>();
 
+        
+        // RabbitMQ
         services.AddSingleton<IConnectionFactory>(sp =>
         {
             var options = sp.GetRequiredService<IOptions<QDrantSettings>>().Value;
