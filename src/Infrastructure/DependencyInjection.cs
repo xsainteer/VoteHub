@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Qdrant.Client;
 using RabbitMQ.Client;
+using StackExchange.Redis;
 
 namespace Infrastructure;
 
@@ -84,6 +85,11 @@ public static class DependencyInjection
                 HostName = options.Host
             };
         });
+        
+        // Redis
+        services.AddSingleton<IConnectionMultiplexer>(
+            ConnectionMultiplexer.Connect(configuration.GetConnectionString("Redis:ConnectionString") ??
+                                          throw new Exception("Redis connection string is not configured.")));
         
         return services;
     }
