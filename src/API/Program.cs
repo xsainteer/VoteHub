@@ -1,19 +1,11 @@
 using API.Mapper;
 using Application;
 using Infrastructure;
-using Infrastructure.Database;
 using Infrastructure.Database.Entities;
 using Infrastructure.Vector;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
-
-
 var builder = WebApplication.CreateBuilder(args);
-
-builder.Services.AddDbContext<VoteHubContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddControllers();
 
@@ -28,22 +20,16 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-builder.Services.AddIdentity<VoteHubUser, IdentityRole<Guid>>(options => 
-        options.SignIn.RequireConfirmedAccount = false)
-    .AddEntityFrameworkStores<VoteHubContext>()
-    .AddApiEndpoints();
-
-builder.Services.AddAuthentication();
-builder.Services.AddAuthorization();
 builder.Services.AddAutoMapper(typeof(MapperProfile).Assembly);
 
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
 
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 
-// Ensuring collection exists
+// Ensuring Qdrant collection exists
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -62,7 +48,6 @@ app.UseSwaggerUI(options =>
     options.SwaggerEndpoint("/swagger/v1/swagger.json", "My API v1");
     options.RoutePrefix = string.Empty;
 });
-
 
 app.UseAuthentication();
 app.UseAuthorization();

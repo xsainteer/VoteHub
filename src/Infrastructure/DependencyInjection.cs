@@ -6,6 +6,7 @@ using Infrastructure.Database.Repositories;
 using Infrastructure.Email;
 using Infrastructure.Vector;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -20,23 +21,24 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
+        // Database
+        services.AddDbContext<VoteHubContext>(options =>
+            options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+        
         // Authentication and Identity
-        services.AddIdentityCore<VoteHubUser>(options => 
+        services.AddIdentity<VoteHubUser, IdentityRole<Guid>>(options => 
                 options.SignIn.RequireConfirmedAccount = configuration.GetValue("SignIn.RequireConfirmedAccount", false))
             .AddEntityFrameworkStores<VoteHubContext>()
             .AddSignInManager()
             .AddDefaultTokenProviders();
         
-        services.AddAuthentication(options =>
-            {
-                options.DefaultScheme = IdentityConstants.ApplicationScheme;
-                options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
-            })
-            .AddIdentityCookies();
+        services.AddAuthentication();
+        
+        services.AddAuthorization();
         
         // SMTP
         services.AddOptions<SmtpSettings>()
-            .BindConfiguration("Smtp")
+            .BindConfiguration("SmtpSettings")
             .ValidateDataAnnotations()
             .Validate(settings => 
             {
@@ -45,6 +47,8 @@ public static class DependencyInjection
                     return false;
                 return !string.IsNullOrWhiteSpace(settings.Host);
             }, "Invalid SMTP configuration");
+
+        services.AddSingleton<IEmailSender<VoteHubUser>, SmtpEmailSender>();
 
         // Database
         services.AddScoped<IPollOptionRepository, PollOptionRepository>();
@@ -55,7 +59,8 @@ public static class DependencyInjection
         // AI and Vector search engine
         services.Configure<QDrantSettings>(configuration.GetSection("QDrantSettings"));
         services.Configure<OllamaSettings>(configuration.GetSection("OllamaSettings"));
-        services.AddScoped<OllamaClient>();
+        services.AddSingleton<OllamaClient>();
+        services.AddHttpClient<OllamaClient>();
         
         services.AddSingleton<QdrantClient>(sp =>
         {
@@ -88,7 +93,7 @@ public static class DependencyInjection
         
         // Redis
         services.AddSingleton<IConnectionMultiplexer>(
-            ConnectionMultiplexer.Connect(configuration.GetConnectionString("Redis:ConnectionString") ??
+            ConnectionMultiplexer.Connect(configuration.GetConnectionString("RedisConnection") ??
                                           throw new Exception("Redis connection string is not configured.")));
         
         return services;
