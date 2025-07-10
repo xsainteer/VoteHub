@@ -1,6 +1,6 @@
 # 🗳️ VoteHub
 
-**VoteHub** is a lightweight voting platform built with Blazor Server and Dapper.  
+**VoteHub** is a lightweight voting platform built with React and ASP.NET.  
 Designed to provide a fast and transparent way to organize, manage, and analyze voting processes.
 
 ## 🚀 Features
@@ -12,17 +12,19 @@ Designed to provide a fast and transparent way to organize, manage, and analyze 
 
 ## 🛠️ Technologies
 
-- **Blazor Server** – UI framework for real-time .NET applications  
+- **React** – UI framework for building interactive user interfaces.
 - **Entity Framework** – ORM to manipulate data in databases. 
 - **PostgreSQL** – Relational database
-- **Authentication** – Identity 2.0
+- **QDrant** – Vector database for storing and querying semantic values of the polls.
+- **Ollama** - AI model for embedding.
 
 ## 📦 Project Structure
 
 - `Domain/` – Core models and logic
 - `Infrastructure/` –Database logic and external services
 - `Application/` – business logic
-- `Presentation/` – Razor Pages(UI)
+- `frontend-react/` – React
+- `API/` – ASP.NET Core Web API
 
 ## 🧪 How to Run Locally
 
